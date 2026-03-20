@@ -10,7 +10,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, rust-overlay, flake-utils }:  
+  outputs = { self, nixpkgs, flake-utils, rust-overlay }:
     let
       perSystem = flake-utils.lib.eachDefaultSystem (system:
         let
@@ -57,6 +57,7 @@
             refresh = lib.mkOption {
               type = lib.types.int;
               default = 144;
+              description = "Display refresh rate in Hz";
             };
           };
 
@@ -80,3 +81,4 @@
       nixosModules.default = nixosModule;
     };
 }
+
