@@ -3,13 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-stable";
+    flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, rust-overlay }:
+  outputs = { self, nixpkgs, rust-overlay, flake-utils }:  
     let
       perSystem = flake-utils.lib.eachDefaultSystem (system:
         let
@@ -36,6 +37,7 @@
           };
         }
       );
+
       nixosModule = { config, lib, pkgs, ... }:
         let cfg = config.bc250.display;
         in {
@@ -52,8 +54,13 @@
               type = lib.types.int;
               default = 1080;
             };
+            # BUG FIX 2: refresh was used in kernelParams but never declared
+            refresh = lib.mkOption {
+              type = lib.types.int;
+              default = 60;
+            };
           };
-        # add firmware blobs to this?
+
           config = {
             hardware.firmware = [
               (pkgs.runCommand "bc250-edid" {} ''
@@ -68,8 +75,9 @@
             ];
           };
         };
+
     in
-      perSystem // {
-        nixosModules.default = nixosModule;
-      };
+    perSystem // {
+      nixosModules.default = nixosModule;
+    };
 }
