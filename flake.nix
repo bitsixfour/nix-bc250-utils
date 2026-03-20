@@ -44,20 +44,19 @@
           options.bc250.display = {
             connector = lib.mkOption {
               type = lib.types.str;
-              default = "HDMI-A-1";
+              default = "DP-2";
             };
             width = lib.mkOption {
               type = lib.types.int;
-              default = 1920;
+              default = 3840;
             };
             height = lib.mkOption {
               type = lib.types.int;
-              default = 1080;
+              default = 2160;
             };
-            # BUG FIX 2: refresh was used in kernelParams but never declared
             refresh = lib.mkOption {
               type = lib.types.int;
-              default = 60;
+              default = 144;
             };
           };
 
