@@ -85,18 +85,11 @@
               after = [ "systemd-udev-settle.service" ];
               wants = [ "systemd-udev-settle.service" ];
               serviceConfig = {
-                ExecStart = "${governorPkg}/bin/cyan-skillfish-governor";
-                Restart = "on-failure";
-                RestartSec = "5s";
-                SupplementaryGroups = [ "video" "render" ];
-                DynamicUser = true;
-                DeviceAllow = [
-                  "char-drm rw"
-                  "char-video rw"
-                ];
-             
-                BindPaths = [ "/dev/dri" ];
-              };
+  		ExecStart = "${governorPkg}/bin/cyan-skillfish-governor";
+  		Restart = "on-failure";
+  		RestartSec = "5s";
+  		User = "root";
+	     };
             };
 
             users.groups.video = {};
