@@ -87,6 +87,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             curr_freq = target_freq;
         }
 
-        std::thread::sleep(config.adjustment_interval - 64 * config.sampling_interval);
+        std::thread::sleep(
+            config.adjustment_interval
+                .checked_sub(65 * config.sampling_interval)
+                .unwrap_or_default(),
+        );
     }
 }
+
