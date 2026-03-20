@@ -7,10 +7,9 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, flake-utils }:
+  outputs = { self, nixpkgs, rust-overlay }:
     let
       perSystem = flake-utils.lib.eachDefaultSystem (system:
         let
@@ -26,7 +25,7 @@
             buildInputs = [ pkgs.libdrm ];
             nativeBuildInputs = [ rustToolchain ];
             meta = {
-              description = "GPU governor for the AMD Cyan Skillfish APU";
+              description = "utils for bc-250 to run on NixOS";
               license = pkgs.lib.licenses.mit;
               platforms = [ "x86_64-linux" ];
             };
@@ -37,21 +36,38 @@
           };
         }
       );
-
-      nixosModule = { pkgs, ... }: { # edid from git repository to
-        hardware.firmware = [
-          (pkgs.runCommand "bc250-edid" {} ''
-            mkdir -p $out/lib/firmware/edid
-            cp ${./edid/1920x1080.bin} $out/lib/firmware/edid/bc250-1080p.bin
-          '')
-        ];
-
-        boot.kernelParams = [
-          "drm.edid_firmware=HDMI-A-1:edid/bc250-1080p.bin"
-          "video=HDMI-A-1:1920x1080@60"
-        ];
-      };
-
+      nixosModule = { config, lib, pkgs, ... }:
+        let cfg = config.bc250.display;
+        in {
+          options.bc250.display = {
+            connector = lib.mkOption {
+              type = lib.types.str;
+              default = "HDMI-A-1";
+            };
+            width = lib.mkOption {
+              type = lib.types.int;
+              default = 1920;
+            };
+            height = lib.mkOption {
+              type = lib.types.int;
+              default = 1080;
+            };
+          };
+        # add firmware blobs to this?
+          config = {
+            hardware.firmware = [
+              (pkgs.runCommand "bc250-edid" {} ''
+                mkdir -p $out/lib/firmware/edid
+                cp ${./edid/${toString cfg.width}x${toString cfg.height}.bin} \
+                  $out/lib/firmware/edid/bc250.bin
+              '')
+            ];
+            boot.kernelParams = [
+              "drm.edid_firmware=${cfg.connector}:edid/bc250.bin"
+              "video=${cfg.connector}:${toString cfg.width}x${toString cfg.height}@${toString cfg.refresh}"
+            ];
+          };
+        };
     in
       perSystem // {
         nixosModules.default = nixosModule;
