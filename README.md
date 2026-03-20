@@ -1,3 +1,3 @@
-# Cyan Skillfish GPU governor
+# nixos-bc-250-utils
 
-obv a fork from Cyan Skillfish GPU governor
+flake utils designed to make using bc-250 easier on NixOS
