@@ -39,7 +39,9 @@
       );
 
       nixosModule = { config, lib, pkgs, ... }:
-        let cfg = config.bc250.display;
+        let
+          cfg = config.bc250.display;
+          governorPkg = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
         in {
           options.bc250.display = {
             connector = lib.mkOption {
@@ -57,7 +59,7 @@
             refresh = lib.mkOption {
               type = lib.types.int;
               default = 144;
-              description = "Display refresh rate in Hz";
+              description = "heckin hertz'";
             };
           };
 
@@ -69,10 +71,36 @@
                   $out/lib/firmware/edid/bc250.bin
               '')
             ];
+
             boot.kernelParams = [
               "drm.edid_firmware=${cfg.connector}:edid/bc250.bin"
               "video=${cfg.connector}:${toString cfg.width}x${toString cfg.height}@${toString cfg.refresh}"
             ];
+
+            environment.systemPackages = [ governorPkg ];
+
+            systemd.services.bc250-governor = {
+              description = "BC-250 Cyan Skillfish Governor";
+              wantedBy = [ "multi-user.target" ];
+              after = [ "systemd-udev-settle.service" ];
+              wants = [ "systemd-udev-settle.service" ];
+              serviceConfig = {
+                ExecStart = "${governorPkg}/bin/cyan-skillfish-governor";
+                Restart = "on-failure";
+                RestartSec = "5s";
+                SupplementaryGroups = [ "video" "render" ];
+                DynamicUser = true;
+                DeviceAllow = [
+                  "char-drm rw"
+                  "char-video rw"
+                ];
+             
+                BindPaths = [ "/dev/dri" ];
+              };
+            };
+
+            users.groups.video = {};
+            users.groups.render = {};
           };
         };
 
