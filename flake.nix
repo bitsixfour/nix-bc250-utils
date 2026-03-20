@@ -85,7 +85,7 @@
               after = [ "systemd-udev-settle.service" ];
               wants = [ "systemd-udev-settle.service" ];
               serviceConfig = {
-  		ExecStart = "${governorPkg}/bin/cyan-skillfish-governor";
+  		ExecStart = "${governorPkg}/bin/cyan-skillfish-governor-smu";
   		Restart = "on-failure";
   		RestartSec = "5s";
   		User = "root";
