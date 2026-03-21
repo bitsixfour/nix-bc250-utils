@@ -79,17 +79,15 @@
             environment.systemPackages = [ governorPkg ];
 
             systemd.services.bc250-governor = {
-              description = "BC-250 Cyan Skillfish Governor";
-              wantedBy = [ "multi-user.target" ];
-              after = [ "systemd-udev-settle.service" ];
-              wants = [ "systemd-udev-settle.service" ];
-              serviceConfig = {
-  		ExecStart = "${governorPkg}/bin/cyan-skillfish-governor-smu";
-  		Restart = "on-failure";
-  		RestartSec = "5s";
-  		User = "root";
-	     };
-            };
+                description = "BC-250 Cyan Skillfish Governor";
+                wantedBy = [ "multi-user.target" ];
+                after = [ "multi-user.target" ];
+                serviceConfig = {
+          	   ExecStart = "${self.packages.${pkgs.system}.default}/bin/cyan-skillfish-governor-smu";
+          	   Restart = "on-failure";
+                   RestartSec = "5s";
+       		 };
+     	     };
 
             users.groups.video = {};
             users.groups.render = {};
