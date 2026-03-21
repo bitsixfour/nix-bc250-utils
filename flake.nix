@@ -71,11 +71,10 @@
                   $out/lib/firmware/edid/bc250.bin
               '')
             ];
-
             boot.kernelParams = [
-              "drm.edid_firmware=${cfg.connector}:edid/bc250.bin"
-              "video=${cfg.connector}:${toString cfg.width}x${toString cfg.height}@${toString cfg.refresh}"
-            ];
+  		"drm.edid_firmware=${cfg.connector}:edid/bc250.bin"
+  		"video=${cfg.connector}:e"
+            ]; 
 
             environment.systemPackages = [ governorPkg ];
 
